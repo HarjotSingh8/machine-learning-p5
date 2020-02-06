@@ -4,7 +4,6 @@ let walls;
 let grid;
 let source = null;
 let destination = null;
-
 let gridSize = 20;
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -26,4 +25,8 @@ function draw() {
   //background(50);
   //if (solved) noLoop();
   //console.log("running");
+  if (aliveCars == 0) {
+    nextGenerationCars();
+  }
+  showCars();
 }

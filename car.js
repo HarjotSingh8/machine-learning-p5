@@ -14,7 +14,18 @@ let collDist = 5;
 let speedMultiplier = 0.1;
 let speed = 10;
 let checkingDistance = 50;
-
+let aliveCars = numChildren;
+function initCars() {
+  for (let i = 0; i < numChildren; i++) {
+    cars.push(new car());
+  }
+}
+function resetCarLocation() {
+  for (let i = 0; i < numChildren; i++) {
+    cars[i].pos = carStart;
+  }
+}
+function nextGenerationCars() {}
 class car {
   constructor() {
     this.pos = carStart;
@@ -23,6 +34,8 @@ class car {
     this.sensors = [];
     this.bias = [];
     this.active = true;
+    this.ml = new MachineLearning(2, 2, [8, 8]);
+    children.push(this.ml);
   }
   setup() {
     this.active = true;

@@ -1,12 +1,39 @@
 let numChildren = 100;
+let children = [];
 let inputNodes;
 let outputNodes;
 let intermediateLayers;
 let variation = 0.001;
+let percentToKeep = 10 / 100; //percent of best children to keep as it is for next generation
 /*
-  order for sensors and forces
+  order for sensors and forces (for code in cars or players, irrelevant for ML algorithm)
   Up, Down, Left, Right
 */
+
+function nextGeneration() {
+  /*
+   * This function creates a new generation by taking best candidates from previous generations
+   */
+  for (let i = numChildren * percentToKeep; i < numChildren; i++) {
+    children[i].copyAndMutate(children[i * percentToKeep]);
+  }
+}
+
+function sortByFitness() {
+  /*
+   * This funciton sorts the children by fitness
+   */
+  for (let i = 0; i < numChildren; i++) {
+    for (let j = i; j < numChildren; j++) {
+      if (children[i].fitness < children[j].fitness) {
+        let temp = children[i];
+        children[i] = children[j];
+        children[j] = temp;
+      }
+    }
+    children[i].resetFitness();
+  }
+}
 
 class MachineLearning {
   /*
@@ -43,6 +70,7 @@ class MachineLearning {
     this.inputNodes = inputNodes; //number of input nodes
     this.outputNodes = outputNodes; //number of output nodes
     this.intermediateLayers = intermediateLayers; //number of intermediate layers
+    this.fitness = 0;
     if (weights == null || biases == null) {
       //if arguments for weights and biases are not given, initialise them with random values
       this.generateRandomWeightsAndBiases();
@@ -57,10 +85,10 @@ class MachineLearning {
     /* generate random weights and biases for the first generation */
     this.weights = [];
     this.balances = [];
-    for (let i = 0; i < intermediateLayers.length; i++) {
+    for (let i = 0; i < this.intermediateLayers.length; i++) {
       let layerWeights = [];
       let layerBalances = [];
-      for (let j = 0; j < intermediateLayers[i]; j++) {
+      for (let j = 0; j < this.intermediateLayers[i]; j++) {
         layerWeights.push(random(-10, 10));
         layerBalances.push(random(-10, 10));
       }
@@ -68,13 +96,30 @@ class MachineLearning {
       this.balances.push(layerBalances);
     }
   }
+  copyAndMutate(source) {
+    /*
+     * This function copies from another organism and mutates it
+     */
+    this.weights = source.weights;
+    this.biases = source.biases;
+    //this.resetFitness();
+    this.mutateWeightsAndBalances(1 / (generation * generation));
+  }
   setWeightsAndBiases(weights, biases) {
     /* set predefined weights and balances */
     this.weights = weights;
     this.biases = biases;
   }
-  mutateWeightsAndBalances() {
+  mutateWeightsAndBalances(factor) {
     /* add variations to weights and balances in subsequent generations */
+    for (let i = 0; i < this.intermediateLayers.length; i++) {
+      for (let j = 0; j < this.intermediateLayers[i].length; j++) {
+        /*
+         * Mutate here
+         */
+        this.intermediateLayers[i][j] += random(-factor, factor);
+      }
+    }
   }
   process(inputs) {
     /*this is just a driver function for the process layer recursive function*/
@@ -98,6 +143,12 @@ class MachineLearning {
     } else {
       return this.processLayer(layer + 1, values);
     }
+  }
+  updateFitness(fitness) {
+    this.fitness = fitness;
+  }
+  resetFitness() {
+    this.fitness = 0;
   }
 }
 

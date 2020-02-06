@@ -27,6 +27,11 @@ function mouseisPressed() {
     box.path = true;
     box.source = true;
     source = box;
+    carStart = createVector(
+      source.xpos + gridSize / 2,
+      source.ypos + gridSize / 2
+    );
+    initCars();
     box.draw();
   } else if (destination == null && box && box.source == false) {
     //init destination
