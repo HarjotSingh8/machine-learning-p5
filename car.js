@@ -1,11 +1,6 @@
 let carStart = undefined;
 let cars = [];
-let sensorOffsets = [
-  [0, -1],
-  [0, 1],
-  [-1, 0],
-  [1, 0]
-];
+let sensorDirections = [];
 /*
   X --> Left & Right (-ve & +ve)
   Y --> Up & Down (-ve & +ve)
@@ -15,6 +10,22 @@ let speedMultiplier = 0.1;
 let speed = 10;
 let checkingDistance = 50;
 let aliveCars = numChildren;
+function initSensors() {
+  sensorDirections.push(createVector(Math.sin(0), Math.cos(0)));
+  sensorDirections.push(createVector(Math.sin(Math.PI), Math.cos(Math.PI)));
+  sensorDirections.push(
+    createVector(Math.sin(Math.PI / 2), Math.cos(Math.PI / 2))
+  );
+  sensorDirections.push(
+    createVector(Math.sin(-Math.PI / 2), Math.cos(-Math.PI / 2))
+  );
+  sensorDirections.push(
+    createVector(Math.sin(Math.PI / 4), Math.cos(Math.PI / 4))
+  );
+  sensorDirections.push(
+    createVector(Math.sin(-Math.PI / 4), Math.cos(-Math.PI / 4))
+  );
+}
 function initCars() {
   for (let i = 0; i < numChildren; i++) {
     cars.push(new car());
@@ -23,40 +34,28 @@ function initCars() {
 function resetCarLocation() {
   for (let i = 0; i < numChildren; i++) {
     cars[i].pos = carStart;
+    cars[i].active = true;
   }
 }
-function nextGenerationCars() {}
+function nextGenerationCars() {
+  nextGeneration();
+  resetCarLocation();
+}
+function drawCars() {}
 class car {
   constructor() {
     this.pos = carStart;
+    this.rotation = 0;
     this.distance = 0;
-    this.force = createVector(1, 1);
+    this.force = createVector(0, 0);
     this.sensors = [];
     this.bias = [];
     this.active = true;
     this.ml = new MachineLearning(2, 2, [8, 8]);
     children.push(this.ml);
   }
-  setup() {
-    this.active = true;
-    this.pos = createVector(carStart.x, carStart.y);
-    for (var i = 0; i < inputNodes.length; i++) {
-      let newBiasLayer = [];
-      for (var j = 0; j < inputNodes[i].length; j++) {
-        newBiasLayer.push(random(-1, 1));
-      }
-      this.bias.push(newBiasLayer());
-    }
-  }
-  nextGeneration() {
-    for (var i = 0; i < 8; i++) {
-      for (var j = 0; j < 8; j++) {
-        //inputNodes[i][j] += random(-variation, variation)
-        this.bias[i][j] = inputNodes[i][j] + random(-variation, variation);
-        //this.bias[i][j] = 0.01
-      }
-      //this.bias.push([inputNodes[i][0]+random(-variation,variation), inputNodes[i][1]+random(-variation,variation), inputNodes[i][2]+random(-variation,variation), inputNodes[i][3]+random(-variation,variation)])
-    }
+  calculateML() {
+    this.ml.process(this.sensors);
   }
   updatePosition() {
     var d = distance(this.pos, this.force);
@@ -65,6 +64,15 @@ class car {
     this.pos.x += (this.force.x * sp) / 10; //d*sp;
     this.pos.y += (this.force.y * sp) / 10; //d*sp;
     //this.pos+=this.force
+  }
+  rotate(degree) {
+    this.rotation += degree;
+    if (this.rotation > 2 * Math.PI) {
+      this.rotation = this.rotation % (2 * Math.PI);
+    }
+    if (this.rotation < 0) {
+      this.rotation = 2 * Math.Pi - this.rotation;
+    }
   }
   updateForce() {
     this.force.x = 0;
@@ -129,8 +137,8 @@ function showSensors() {
         line(
           cars[i].pos.x,
           cars[i].pos.y,
-          cars[i].pos.x + sensorOffsets[j][0] * 20,
-          cars[i].pos.y + sensorOffsets[j][1] * 20
+          cars[i].pos.x + sensorDirections[j].x * 20,
+          cars[i].pos.y + sensorOffsets[j].y * 20
         );
     }
   }
@@ -159,6 +167,26 @@ function checkIntersection(v1, v2, v3, v4) {
     }
   }
   return false;
+}
+
+vector = null;
+degree = 0;
+function changeVector(degree) {
+  vector = createVector(Math.sin(degree), Math.cos(degree));
+}
+function showVector() {
+  if (carStart != null && vector != null) {
+    //changeVector();
+    //degree += Math.PI / 360;
+    stroke(255);
+    line(
+      carStart.x,
+      carStart.y,
+      carStart.x + vector.x * 50,
+      carStart.y + vector.y * 50
+    );
+    console.log(carStart, vector);
+  }
 }
 
 function distance(v1, v2) {

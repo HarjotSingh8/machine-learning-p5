@@ -14,6 +14,7 @@ function nextGeneration() {
   /*
    * This function creates a new generation by taking best candidates from previous generations
    */
+  sortByFitness();
   for (let i = numChildren * percentToKeep; i < numChildren; i++) {
     children[i].copyAndMutate(children[i * percentToKeep]);
   }
@@ -69,7 +70,13 @@ class MachineLearning {
   constructor(inputNodes, outputNodes, intermediateLayers, weights, biases) {
     this.inputNodes = inputNodes; //number of input nodes
     this.outputNodes = outputNodes; //number of output nodes
-    this.intermediateLayers = intermediateLayers; //number of intermediate layers
+    this.layers = []; //number of intermediate layers
+    this.layers.push(inputNodes);
+    //this.layers.push(intermediateLayers);
+    for (let i = 0; i < intermediateLayers.length; i++) {
+      this.layers.push(intermediateLayers[i]);
+    }
+    this.layers.push(outputNodes);
     this.fitness = 0;
     if (weights == null || biases == null) {
       //if arguments for weights and biases are not given, initialise them with random values
@@ -84,16 +91,22 @@ class MachineLearning {
   generateRandomWeightsAndBiases() {
     /* generate random weights and biases for the first generation */
     this.weights = [];
-    this.balances = [];
-    for (let i = 0; i < this.intermediateLayers.length; i++) {
+    this.biases = [];
+    for (let i = 0; i < this.layers.length - 1; i++) {
       let layerWeights = [];
-      let layerBalances = [];
-      for (let j = 0; j < this.intermediateLayers[i]; j++) {
-        layerWeights.push(random(-10, 10));
-        layerBalances.push(random(-10, 10));
+      let layerBiases = [];
+      for (let j = 0; j < this.layers[i]; j++) {
+        let nodeWeights = [];
+        let nodeBiases = [];
+        for (let k = 0; k < this.layers[i + 1]; k++) {
+          nodeWeights.push(random(-1, 1));
+          nodeBiases.push(random(-1, 1));
+        }
+        layerWeights.push(nodeWeights);
+        layerBiases.push(nodeBiases);
       }
       this.weights.push(layerWeights);
-      this.balances.push(layerBalances);
+      this.biases.push(layerBiases);
     }
   }
   copyAndMutate(source) {
@@ -110,14 +123,17 @@ class MachineLearning {
     this.weights = weights;
     this.biases = biases;
   }
-  mutateWeightsAndBalances(factor) {
+  mutateWeightsAndBiases(factor) {
     /* add variations to weights and balances in subsequent generations */
-    for (let i = 0; i < this.intermediateLayers.length; i++) {
-      for (let j = 0; j < this.intermediateLayers[i].length; j++) {
-        /*
-         * Mutate here
-         */
-        this.intermediateLayers[i][j] += random(-factor, factor);
+    for (let i = 0; i < this.weights.length; i++) {
+      for (let j = 0; j < this.weights[i].length; j++) {
+        for (let k = 0; k < this.weights[i][j].length; k++) {
+          /*
+           * Mutate here
+           */
+          this.weights[i][j][k] += random(-factor, factor);
+          this.biases[i][j][k] += random(-factor, factor);
+        }
       }
     }
   }
@@ -128,18 +144,22 @@ class MachineLearning {
   processLayer(layer, inputs) {
     /*recursive function that performs all the calculation with current weights and biases*/
     let values = [];
-    for (let i = 0; i < intermediateLayers[layer].length; i++) {
+    for (let i = 0; i < this.layers[layer + 1]; i++) {
       /*initialise values array with zeroes*/
       values.push(0);
     }
+    //console.log(inputs);
     for (let i = 0; i < inputs.length; i++) {
-      for (let j = 0; j < intermediateLayers[layer].length; j++) {
+      for (let j = 0; j < this.layers[layer + 1]; j++) {
         /*multiplying weights with inputs and adding biases for every node in inupt and node in layer*/
-        values[j] = inputs[i] * this.weights[layer][j] + this.biases[layer][j];
+        values[j] +=
+          inputs[i] * this.weights[layer][i][j] + this.biases[layer][i][j];
+        //console.log(values);
       }
     }
-    if (layer == intermediateLayers.length) {
-      return output;
+    if (layer == this.layers.length - 2) {
+      console.log(values);
+      return values;
     } else {
       return this.processLayer(layer + 1, values);
     }

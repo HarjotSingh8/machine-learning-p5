@@ -29,4 +29,6 @@ function draw() {
     nextGenerationCars();
   }
   showCars();
+  showVector();
+  showSensors();
 }
