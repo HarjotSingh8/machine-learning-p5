@@ -158,7 +158,7 @@ class MachineLearning {
       }
     }
     if (layer == this.layers.length - 2) {
-      console.log(values);
+      //console.log(values);
       return values;
     } else {
       return this.processLayer(layer + 1, values);

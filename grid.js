@@ -59,12 +59,31 @@ class Node {
     this.y = j;
     this.xpos = (windowWidth / cols) * i;
     this.ypos = (windowHeight / rows) * j;
-    this.path = false;
     this.source = false;
-    this.destination = false;
+    this.path = false;
     this.distance = Infinity;
     this.prevNode = null;
-    this.visited = null;
+    this.walls = [];
+    this.neighbors = [];
+  }
+  initWalls() {
+    this.walls = [];
+    this.walls.push([
+      createVector(this.xpos, this.ypos),
+      createVector(this.xpos + gridSize, this.ypos)
+    ]);
+  }
+  showWalls() {
+    stroke(255);
+    for (let i = 0; i < this.walls.length; i++) {
+      line(
+        this.walls[i][0].x,
+        this.walls[i][0].y,
+        this.walls[i][1].x,
+        this.walls[i][1].y
+      );
+    }
+    stroke(0);
   }
   draw() {
     if (this.source) fill(255, 0, 0);

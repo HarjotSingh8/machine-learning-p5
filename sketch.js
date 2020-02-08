@@ -7,7 +7,7 @@ let destination = null;
 let gridSize = 20;
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  frameRate(10);
+  frameRate(1);
   rows = floor(windowHeight / gridSize);
   cols = floor(windowWidth / gridSize);
   grid = new Grid(rows, cols);
@@ -18,6 +18,7 @@ function setup() {
   destinationcolor = color(0, 0, 200);
   visitedcolor = color(255, 255, 255);
   strokeWeight(1);
+  initSensors();
   grid.draw();
 }
 
@@ -25,10 +26,14 @@ function draw() {
   //background(50);
   //if (solved) noLoop();
   //console.log("running");
+  stroke(0);
+  grid.draw();
   if (aliveCars == 0) {
     nextGenerationCars();
   }
-  showCars();
-  showVector();
-  showSensors();
+  if (carsInitialised) {
+    showCars();
+    showVector();
+    showSensors();
+  }
 }

@@ -2,6 +2,7 @@ let mouseIsPressed = false;
 let movingDestination = false;
 let mouseSetsWall = false; /*This decides if dragging set or removes the walls*/
 let prevDestination = false;
+let previous = null;
 let menuIsClicked = false;
 function menuClicked() {
   console.log("mousePressed on menu");
@@ -17,6 +18,7 @@ function mouseisPressed() {
 
   if (menuIsClicked) {
     menuIsClicked = false;
+    initCars();
     return;
   }
   console.log("mousePressed on grid");
@@ -27,33 +29,24 @@ function mouseisPressed() {
     box.path = true;
     box.source = true;
     source = box;
+    previous = box;
     carStart = createVector(
       source.xpos + gridSize / 2,
       source.ypos + gridSize / 2
     );
-    initCars();
+    //initCars();
     box.draw();
-  } else if (destination == null && box && box.source == false) {
-    //init destination
-    console.log("initialise destination");
-    box.path = true;
-    box.destination = true;
-    destination = box;
-    prevDestination = box;
+  } else if (
+    box &&
+    box != source &&
+    box.path == true &&
+    box.NumberOfNeighbors == 1
+  ) {
+    box.path = false;
+  } else if (box && checkNeighbor(box, previous)) {
+    mouseIsPressed = true;
+
     box.draw();
-  } else if (box) {
-    if (box.destination) {
-      movingDestination = true;
-      mouseIsPressed = true;
-    } else if (box.source) {
-      console.log("moving source");
-      //code to move source here
-    } else {
-      mouseIsPressed = true;
-      box.path = !box.path;
-      mouseSetsWall = box.path;
-      box.draw();
-    }
   }
 }
 function mouseDragged() {
@@ -98,6 +91,21 @@ function onMenu() {
     if (mouseX >= 5 && mouseY >= 27)
       //checking for menu when menu is expanded
       return true;
+  }
+  return false;
+}
+function addBoxToPath(current, prev) {
+  box.path = true;
+  box.NumberOfNeighbors == 1;
+  prev.NumberOfNeighbors += 1;
+  box.prev;
+}
+function checkNeighbor(a, b) {
+  if (a.x == b.x && (a.y - b.y == -1 || a.y - b.y == 1)) {
+    return true;
+  }
+  if (a.y == b.y && (a.x - b.x == -1 || a.x - b.x == 1)) {
+    return true;
   }
   return false;
 }

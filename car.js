@@ -10,8 +10,9 @@ let speedMultiplier = 0.1;
 let speed = 10;
 let checkingDistance = 50;
 let aliveCars = numChildren;
+let carsInitialised = false;
 function initSensors() {
-  sensorDirections.push(createVector(Math.sin(0), Math.cos(0)));
+  /*sensorDirections.push(createVector(Math.sin(0), Math.cos(0)));
   sensorDirections.push(createVector(Math.sin(Math.PI), Math.cos(Math.PI)));
   sensorDirections.push(
     createVector(Math.sin(Math.PI / 2), Math.cos(Math.PI / 2))
@@ -24,12 +25,19 @@ function initSensors() {
   );
   sensorDirections.push(
     createVector(Math.sin(-Math.PI / 4), Math.cos(-Math.PI / 4))
-  );
+  );*/
+  sensorDirections.push(0);
+  sensorDirections.push(Math.PI / 2);
+  sensorDirections.push(-Math.PI / 2);
+  sensorDirections.push(Math.PI / 4);
+  sensorDirections.push(-Math.PI / 4);
+  sensorDirections.push(Math.PI);
 }
 function initCars() {
   for (let i = 0; i < numChildren; i++) {
     cars.push(new car());
   }
+  carsInitialised = true;
 }
 function resetCarLocation() {
   for (let i = 0; i < numChildren; i++) {
@@ -47,7 +55,8 @@ class car {
     this.pos = carStart;
     this.rotation = 0;
     this.distance = 0;
-    this.force = createVector(0, 0);
+    //this.force = createVector(0, 0);
+    this.force = 0;
     this.sensors = [];
     this.bias = [];
     this.active = true;
@@ -57,14 +66,33 @@ class car {
   calculateML() {
     this.ml.process(this.sensors);
   }
+  updateCar() {
+    let output = this.ml.process([
+      this.pos.x / windowWidth,
+      this.pos.y / windowHeight
+    ]);
+    //console.log(this.pos.x);
+    this.rotate(output[1] / 10);
+    //console.log(this.force);
+    this.updateForce(output[0]);
+    //console.log(this.pos.x);
+    //if (this.pos.x < windowWidth && this.pos.x > 0)
+    this.updatePosition();
+  }
   updatePosition() {
     var d = distance(this.pos, this.force);
     this.dist += d;
     var sp = speed / d;
-    this.pos.x += (this.force.x * sp) / 10; //d*sp;
-    this.pos.y += (this.force.y * sp) / 10; //d*sp;
+    //console.log(this.force / 1000);
+    this.pos = createVector(
+      this.pos.x + this.force * Math.sin(this.rotation),
+      this.pos.y + this.force * Math.cos(this.rotation)
+    );
+    //(this.force * Math.sin(this.rotation)) / 1000; //d*sp;
+    //this.pos.y += 0.1; //(this.force * Math.cos(this.rotation)) / 1000; //d*sp;
     //this.pos+=this.force
   }
+
   rotate(degree) {
     this.rotation += degree;
     if (this.rotation > 2 * Math.PI) {
@@ -74,12 +102,13 @@ class car {
       this.rotation = 2 * Math.Pi - this.rotation;
     }
   }
-  updateForce() {
-    this.force.x = 0;
-    this.force.y = 0;
+  updateForce(input) {
+    this.force = input;
+    //this.force.x = input;
+    //this.force.y = input;
     for (var i = 0; i < 8; i++) {
       for (var j = 0; j < 8; j++) {
-        this.force.x +=
+        /*this.force.x +=
           this.bias[i][j] *
           sensorOffsets[i][0] *
           (this.pos.x - this.sensors[i].x) *
@@ -90,6 +119,7 @@ class car {
           (this.pos.y - this.sensors[i].y) *
           (this.pos.y - this.sensors[i].y); //this.sensors[i].y;
         //console.log(this.bias[i][j]);
+        */
       }
     }
   }
@@ -119,6 +149,7 @@ function showCars() {
     //console.log(cars[i].active);
     //console.log(cars[i].pos)
     //cars[i].updatePosition();
+    cars[i].updateCar();
     if (cars[i].active) ellipse(cars[i].pos.x, cars[i].pos.y, 5, 5);
     if (cars[i].active) {
       completedgeneration = false;
@@ -132,14 +163,19 @@ function showSensors() {
   stroke(255);
   for (var i = 0; i < cars.length; i++) {
     //console.log('ran');
-    for (var j = 0; j < sensorOffsets.length; j++) {
-      if (cars[i].active)
+    for (var j = 0; j < sensorDirections.length; j++) {
+      if (cars[i].active) {
+        let temp = createVector(
+          Math.sin(sensorDirections[j] + cars[i].rotation),
+          Math.cos(sensorDirections[j] + cars[i].rotation)
+        );
         line(
           cars[i].pos.x,
           cars[i].pos.y,
-          cars[i].pos.x + sensorDirections[j].x * 20,
-          cars[i].pos.y + sensorOffsets[j].y * 20
+          cars[i].pos.x + temp.x * 10,
+          cars[i].pos.y + temp.y * 10
         );
+      }
     }
   }
 }
