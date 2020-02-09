@@ -7,7 +7,7 @@ let destination = null;
 let gridSize = 20;
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  frameRate(1);
+  frameRate(24);
   rows = floor(windowHeight / gridSize);
   cols = floor(windowWidth / gridSize);
   grid = new Grid(rows, cols);

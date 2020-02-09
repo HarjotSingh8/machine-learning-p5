@@ -1,4 +1,4 @@
-let numChildren = 100;
+let numChildren = 500;
 let children = [];
 let inputNodes;
 let outputNodes;
@@ -100,7 +100,7 @@ class MachineLearning {
         let nodeBiases = [];
         for (let k = 0; k < this.layers[i + 1]; k++) {
           nodeWeights.push(random(-1, 1));
-          nodeBiases.push(random(-1, 1));
+          nodeBiases.push(random(-0.5, 0.5));
         }
         layerWeights.push(nodeWeights);
         layerBiases.push(nodeBiases);

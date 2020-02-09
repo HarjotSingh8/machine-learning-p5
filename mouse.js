@@ -2,7 +2,7 @@ let mouseIsPressed = false;
 let movingDestination = false;
 let mouseSetsWall = false; /*This decides if dragging set or removes the walls*/
 let prevDestination = false;
-let previous = null;
+let last = null;
 let menuIsClicked = false;
 function menuClicked() {
   console.log("mousePressed on menu");
@@ -11,42 +11,48 @@ function menuClicked() {
 function mousePressed() {
   setTimeout(mouseisPressed, 10);
 }
+
 function mouseisPressed() {
   /*
    * This is an event listener for mouse pressed
    */
-
   if (menuIsClicked) {
+    //do not perform actions on grid if mouse is pressed on menu items
     menuIsClicked = false;
     initCars();
     return;
   }
-  console.log("mousePressed on grid");
-  let box = grid.overbox();
-  if (source == null && box) {
-    //init start
-    console.log("initialising start");
-    box.path = true;
-    box.source = true;
-    source = box;
-    previous = box;
-    carStart = createVector(
-      source.xpos + gridSize / 2,
-      source.ypos + gridSize / 2
-    );
-    //initCars();
-    box.draw();
-  } else if (
-    box &&
-    box != source &&
-    box.path == true &&
-    box.NumberOfNeighbors == 1
-  ) {
-    box.path = false;
-  } else if (box && checkNeighbor(box, previous)) {
-    mouseIsPressed = true;
 
-    box.draw();
+  let box = grid.overbox(mouseX, mouseY);
+  if (box) {
+    if (source == null) {
+      //set source
+      console.log("initialising start");
+      box.path = true;
+      box.source = true;
+      source = box;
+      previous = box;
+      carStart = createVector(
+        source.xpos + gridSize / 2,
+        source.ypos + gridSize / 2
+      );
+      mouseSetsWall = true;
+      //initCars();
+      box.draw();
+    } else if (
+      box != source &&
+      box.path == true &&
+      box.NumberOfNeighbors == 1
+    ) {
+      //clear box if it was last on link
+      box.path = false;
+      mouseSetsWall = false;
+    } else if (checkNeighbor(box, previous)) {
+      mouseIsPressed = true;
+      addBoxToPath(box, previous);
+      mouseSetsWall = true;
+      box.draw();
+    }
   }
 }
 function mouseDragged() {
@@ -54,24 +60,11 @@ function mouseDragged() {
    * Event listener for mouse dragged
    */
   if (mouseIsPressed) {
-    let box = grid.overbox();
+    let box = grid.overbox(mouseX, mouseY);
     if (box) {
-      if (
-        movingDestination &&
-        box != destination &&
-        box.visited &&
-        box != source
-      ) {
-        console.log("moving");
-        prevDestination.destination = false;
-        destination = box;
-        box.destination = true;
-        prevDestination.draw();
-        prevDestination = box;
-        startpath();
-        box.draw();
-      } else if (box != destination && box != source) {
+      if (checkNeighbor(box, previous)) {
         box.path = mouseSetsWall;
+        addBoxToPath(box, previous);
         box.draw();
       }
     }
@@ -94,11 +87,12 @@ function onMenu() {
   }
   return false;
 }
-function addBoxToPath(current, prev) {
+function addBoxToPath(box, prev) {
   box.path = true;
   box.NumberOfNeighbors == 1;
   prev.NumberOfNeighbors += 1;
-  box.prev;
+  box.prev = prev;
+  previous = box;
 }
 function checkNeighbor(a, b) {
   if (a.x == b.x && (a.y - b.y == -1 || a.y - b.y == 1)) {

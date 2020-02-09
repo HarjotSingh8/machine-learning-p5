@@ -17,26 +17,15 @@ class Grid {
       }
     }
   }
-  overbox() {
+  overbox(x, y) {
     /*
-     * this function checks if the mouse was present over a box when it was pressed
-     * mouseX returns x co-ordinate of mouse
-     * mouseY returns y co-ordinate of mouse
-     * mouse co-ordinates are computed to get the box in which the mouse currently exists in
+     * this function checks if the co-ordinates passed are present inside a box
+     * entered co-ordinates are computed to get the box in which the mouse currently exists in
      */
-    console.log(
-      floor((mouseX / windowWidth) * cols) +
-        "," +
-        floor((mouseY / windowHeight) * rows)
-    );
-    if (
-      mouseX > 0 &&
-      mouseX < windowWidth &&
-      mouseY > 0 &&
-      mouseY < windowWidth
-    )
-      return this.grid[floor((mouseY / windowHeight) * rows)][
-        floor((mouseX / windowWidth) * cols)
+    //console.log(floor((x / windowWidth) * cols) + "," + floor((y / windowHeight) * rows));
+    if (x > 0 && x < windowWidth && y > 0 && y < windowHeight)
+      return this.grid[floor((y / windowHeight) * rows)][
+        floor((x / windowWidth) * cols)
       ];
     return false;
   }
@@ -65,12 +54,29 @@ class Node {
     this.prevNode = null;
     this.walls = [];
     this.neighbors = [];
+    this.initWalls();
   }
   initWalls() {
     this.walls = [];
     this.walls.push([
       createVector(this.xpos, this.ypos),
       createVector(this.xpos + gridSize, this.ypos)
+    ]);
+    this.walls.push([
+      createVector(this.xpos, this.ypos),
+      createVector(this.xpos, this.ypos + gridSize)
+    ]);
+    this.walls.push([
+      createVector(this.xpos, this.ypos),
+      createVector(this.xpos, this.ypos + gridSize)
+    ]);
+    this.walls.push([
+      createVector(this.xpos + gridSize, this.ypos),
+      createVector(this.xpos + gridSize, this.ypos + gridSize)
+    ]);
+    this.walls.push([
+      createVector(this.xpos, this.ypos + gridSize),
+      createVector(this.xpos + gridSize, this.ypos + gridSize)
     ]);
   }
   showWalls() {
