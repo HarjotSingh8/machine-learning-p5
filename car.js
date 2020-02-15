@@ -11,7 +11,7 @@ let speed = 10;
 let checkingDistance = 50;
 let aliveCars = numChildren;
 let carsInitialised = false;
-let sensorLength = 20;
+let sensorLength = 15;
 function initSensors() {
   sensorDirections.push(0);
   sensorDirections.push(Math.PI / 2);
@@ -27,16 +27,19 @@ function initCars() {
     }
     carsInitialised = true;
   }
+  frameCounter = 0;
 }
-function resetCarsLocation() {
-  for (let i = 0; i < numChildren; i++) {
-    cars[i].pos = carStart;
-    cars[i].active = true;
+function resetCars() {
+  for (let i = 0; i < cars.length; i++) {
+    //cars[i].pos = carStart;
+    //cars[i].active = true;
+    cars[i].reset();
+    //cars[i].distance = 0;
   }
 }
 function nextGenerationCars() {
+  console.log("new generation");
   nextGeneration();
-  resetCarLocation();
 }
 
 function drawCars() {}
@@ -50,17 +53,24 @@ class car {
     this.force = 0;
     this.sensors = [];
     this.bias = [];
+    this.time = 0;
     this.active = true;
-    this.ml = new MachineLearning(5, 2, [4, 4]);
+    this.ml = new MachineLearning(5, 2, [8, 8, 4]);
     this.box = source;
+    this.boxesToCheckWalls = [];
     this.activeBoxes = [source];
     children.push(this.ml);
+    this.updateBoxesForWalls();
+    this.boxChanged(this.box);
   }
   calculateML() {
     //this.ml.process(this.sensors);
   }
   updateCar() {
+    this.checkBoxChange();
     this.updateSensors();
+
+    //console.log(this.sensors);
     let output = this.ml.process([
       distance(this.pos, this.sensors[0]) / sensorLength,
       distance(this.pos, this.sensors[1]) / sensorLength,
@@ -68,10 +78,12 @@ class car {
       distance(this.pos, this.sensors[3]) / sensorLength,
       distance(this.pos, this.sensors[4]) / sensorLength
     ]);
+    if (output[1] > 1) output[1] = 1;
+    if (output[1] < -1) output[1] = -1;
+
     this.rotate(output[1] / 10);
     this.updateForce(output[0]);
     this.updatePosition();
-    this.checkBoxChange();
   }
   updatePosition() {
     var d = distance(this.pos, this.force);
@@ -94,8 +106,8 @@ class car {
   }
   updateForce(input) {
     this.force = input;
-    if (this.force > 10) this.force = 10;
-    if (this.force < -10) this.force = -10;
+    if (this.force > 4) this.force = 4;
+    if (this.force < -4) this.force = -4;
     //this.force.x = input;
     //this.force.y = input;
     for (var i = 0; i < 8; i++) {
@@ -118,41 +130,58 @@ class car {
   checkBoxChange() {
     let box = grid.overbox(this.pos.x, this.pos.y);
     //if (box) box.path = true;
-    if (box) {
-      if (box.path == true) this.boxChanged();
-      else this.active = false;
+    if (box && this.box != box) {
+      if (box.path == true) {
+        this.boxChanged(box);
+        this.distance = box.distance;
+        this.fitness = box.distance;
+      } else this.active = false;
+      if (this.distance == dist) this.active = false;
     }
   }
-  boxChanged() {
+  boxChanged(box) {
     //what to perform once box changes
+    this.time = frameCounter;
+    this.box = box;
+    this.updateBoxesForWalls();
+  }
+  updateBoxesForWalls() {
+    this.boxesToCheckWalls = this.box.returnNeighbors();
+    this.boxesToCheckWalls.push(this.box);
   }
   updateSensors() {
     this.sensors = [];
-
+    //console.log(this.boxesToCheckWalls);
     for (var i = 0; i < sensorDirections.length; i++) {
       let foundIntersection = false;
       let temp;
       let intersection;
-      for (var j = 0; j < this.box.walls.length; j++) {
-        temp = createVector(
-          this.pos.x +
-            Math.sin(sensorDirections[i] + this.rotation) * sensorLength,
-          this.pos.y +
-            Math.cos(sensorDirections[i] + this.rotation) * sensorLength
-        );
-        if (temp)
-          intersection = checkIntersection(
-            this.pos,
-            temp,
-            this.box.walls[j][0],
-            this.box.walls[j][1]
+      for (var j = 0; j < this.boxesToCheckWalls.length; j++) {
+        for (var k = 0; k < this.boxesToCheckWalls[j].walls.length; k++) {
+          temp = createVector(
+            this.pos.x +
+              Math.sin(sensorDirections[i] + this.rotation) * sensorLength,
+            this.pos.y +
+              Math.cos(sensorDirections[i] + this.rotation) * sensorLength
           );
-        console.log(intersection);
-        if (intersection) {
-          this.sensors.push(intersection);
-          foundIntersection = true;
-          break;
+          if (temp)
+            intersection = checkIntersection(
+              this.pos,
+              temp,
+              this.boxesToCheckWalls[j].walls[k][0],
+              this.boxesToCheckWalls[j].walls[k][1]
+            );
+          //console.log(intersection);
+          if (intersection) {
+            this.sensors.push(intersection);
+            foundIntersection = true;
+            if (distance(this.pos, intersection) < 2) {
+              this.active = false;
+            }
+            break;
+          }
         }
+        if (intersection) break;
       }
       if (foundIntersection == false) {
         this.sensors.push(temp);
@@ -160,6 +189,15 @@ class car {
       //this.sensors = checkNearestIntersection(this.pos);
       //console.log(this.sensors);
     }
+  }
+  reset() {
+    this.rotation = 0;
+    this.force = 0;
+    this.active = true;
+    this.pos = carStart;
+    this.distance = 0;
+    //this.box = source;
+    this.boxChanged(source);
   }
   checkColl() {
     for (var i = 0; i < this.sensors.length; i++) {
@@ -170,23 +208,29 @@ class car {
       //ellipse(this.sensors[i].x, this.sensors[i].y, 5, 5)
     }
   }
+  resetFitness() {
+    this.distance = 0;
+  }
 }
 
 function showCars() {
   noStroke();
-  fill(255);
+
   completedgeneration = true;
   for (var i = 0; i < cars.length; i++) {
-    cars[i].updateCar();
-    if (cars[i].active) ellipse(cars[i].pos.x, cars[i].pos.y, 5, 5);
+    fill(0, 0, (i * 255) / cars.length);
     if (cars[i].active) {
-      completedgeneration = false;
+      cars[i].updateCar();
+      ellipse(cars[i].pos.x, cars[i].pos.y, 5, 5);
     }
+    //if (cars[i].active) {
+    //  completedgeneration = false;
+    //}
   }
 }
 
 function showSensors() {
-  stroke(200);
+  stroke(150);
   /*for (var i = 0; i < cars.length; i++) {
     //console.log('ran');
     for (var j = 0; j < sensorDirections.length; j++) {
@@ -207,7 +251,7 @@ function showSensors() {
   for (var i = 0; i < cars.length; i++) {
     for (var j = 0; j < sensorDirections.length; j++) {
       if (cars[i].active) {
-        console.log(cars[i].sensors);
+        //console.log(cars[i].sensors);
         line(
           cars[i].pos.x,
           cars[i].pos.y,

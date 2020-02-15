@@ -1,10 +1,12 @@
-let numChildren = 500;
+let numChildren = 1000;
 let children = [];
 let inputNodes;
 let outputNodes;
 let intermediateLayers;
 let variation = 0.001;
-let percentToKeep = 10 / 100; //percent of best children to keep as it is for next generation
+let generation = 1;
+let factor = 10;
+let percentToKeep = 1 / 10; //percent of best children to keep as it is for next generation
 /*
   order for sensors and forces (for code in cars or players, irrelevant for ML algorithm)
   Up, Down, Left, Right
@@ -14,26 +16,49 @@ function nextGeneration() {
   /*
    * This function creates a new generation by taking best candidates from previous generations
    */
+  generation++;
+  runDuration += 10 * generation;
+  factor += generation;
+  percentToKeep += 1 / 100;
   sortByFitness();
-  for (let i = numChildren * percentToKeep; i < numChildren; i++) {
-    children[i].copyAndMutate(children[i * percentToKeep]);
+  for (let i = parseInt(cars.length * percentToKeep); i < cars.length; i++) {
+    //console.log(
+    //  "destination = " + i + ",source = " + (i % (cars.length * percentToKeep))
+    //);
+    //console.log(cars[i % (cars.length * percentToKeep)].distance);
+    cars[i].ml.copyAndMutate(
+      cars[parseInt(i % (cars.length * percentToKeep))].ml
+    );
   }
+  /*for (let i = 1; i < cars.length; i++) {
+    cars[i].ml.copyAndMutate(cars[0].ml);
+  }*/
+  resetCars();
 }
 
 function sortByFitness() {
   /*
    * This funciton sorts the children by fitness
    */
-  for (let i = 0; i < numChildren; i++) {
-    for (let j = i; j < numChildren; j++) {
-      if (children[i].fitness < children[j].fitness) {
-        let temp = children[i];
-        children[i] = children[j];
-        children[j] = temp;
+  for (let i = 0; i < cars.length; i++) {
+    for (let j = i; j < cars.length; j++) {
+      if (cars[i].distance < cars[j].distance) {
+        let temp = cars[i];
+        cars[i] = cars[j];
+        cars[j] = temp;
+      }
+      if (cars[i].distance == cars[j].distance) {
+        if (cars[i].distance / cars[i].time < cars[j].distance / cars[i].time) {
+          let temp = cars[i];
+          cars[i] = cars[j];
+          cars[j] = temp;
+        }
       }
     }
-    children[i].resetFitness();
+    //console.log(cars[i].distance);
+    //cars[i].resetFitness();
   }
+  //console.log(cars[0].distance);
 }
 
 class MachineLearning {
@@ -113,17 +138,17 @@ class MachineLearning {
     /*
      * This function copies from another organism and mutates it
      */
-    this.weights = source.weights;
-    this.biases = source.biases;
+    //this.weights = Array.from(source.weights);
+    //this.biases = Array.from(source.biases);
     //this.resetFitness();
-    this.mutateWeightsAndBalances(1 / (generation * generation));
+    this.mutateWeightsAndBiases(source, factor);
   }
   setWeightsAndBiases(weights, biases) {
     /* set predefined weights and balances */
     this.weights = weights;
     this.biases = biases;
   }
-  mutateWeightsAndBiases(factor) {
+  mutateWeightsAndBiases(source, factor) {
     /* add variations to weights and balances in subsequent generations */
     for (let i = 0; i < this.weights.length; i++) {
       for (let j = 0; j < this.weights[i].length; j++) {
@@ -131,8 +156,22 @@ class MachineLearning {
           /*
            * Mutate here
            */
-          this.weights[i][j][k] += random(-factor, factor);
-          this.biases[i][j][k] += random(-factor, factor);
+          let ran = Math.random(1, 10) / factor;
+          let sign = 1;
+          if (Math.random(-1, 1) < 0) sign = -1;
+          //this.weights[i][j][k] += random(-10, 10) / 500;
+          //this.biases[i][j][k] += random(-10, 10) / 500;
+          //if (Math.random(0, 100) < factor) {
+          this.weights[i][j][k] = source.weights[i][j][k] + ran * sign;
+          //+ Math.random(-10, 10) / factor;
+          //}
+          ran = Math.random(1, 10) / factor;
+          sign = 1;
+          if (Math.random(-1, 1) < 0) sign = -1;
+          //if (Math.random(0, 100) < factor) {
+          this.biases[i][j][k] = source.biases[i][j][k] + ran * sign;
+          // + Math.random(-5, 5) / factor;
+          //}
         }
       }
     }

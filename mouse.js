@@ -47,7 +47,7 @@ function mouseisPressed() {
       //clear box if it was last on link
       box.path = false;
       mouseSetsWall = false;
-    } else if (checkNeighbor(box, previous)) {
+    } else if (box.path == false && checkNeighbor(box, previous)) {
       mouseIsPressed = true;
       addBoxToPath(box, previous);
       mouseSetsWall = true;
@@ -88,12 +88,18 @@ function onMenu() {
   return false;
 }
 function addBoxToPath(box, prev) {
+  console.log(box.x + "," + box.y);
   box.path = true;
   box.NumberOfNeighbors == 1;
   prev.NumberOfNeighbors += 1;
   box.prev = prev;
   previous = box;
+  box.updateWalls(prev);
+  prev.updateWalls(box);
+  dist++;
+  box.distance = dist;
 }
+
 function checkNeighbor(a, b) {
   if (a.x == b.x && (a.y - b.y == -1 || a.y - b.y == 1)) {
     return true;

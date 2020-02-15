@@ -5,9 +5,16 @@ let grid;
 let source = null;
 let destination = null;
 let gridSize = 20;
+let dist;
+let frameCounter = 0;
+let runDuration = 300;
+function setRunDuration(arg) {
+  runDuration = arg;
+}
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  frameRate(24);
+  frameRate(30);
+  dist = 0;
   rows = floor(windowHeight / gridSize);
   cols = floor(windowWidth / gridSize);
   grid = new Grid(rows, cols);
@@ -23,6 +30,11 @@ function setup() {
 }
 
 function draw() {
+  frameCounter++;
+  if (frameCounter == runDuration && carsInitialised == true) {
+    nextGenerationCars();
+    frameCounter = 0;
+  }
   //background(50);
   //if (solved) noLoop();
   //console.log("running");
@@ -32,8 +44,8 @@ function draw() {
     nextGenerationCars();
   }
   if (carsInitialised) {
-    showCars();
-    showVector();
-    showSensors();
+    for (let i = 0; i < 2; i++) showCars();
+    //showVector();
+    //showSensors();
   }
 }
