@@ -8,13 +8,16 @@ let gridSize = 20;
 let dist;
 let frameCounter = 0;
 let runDuration = 300;
+let showTrails = true;
+
 function setRunDuration(arg) {
   runDuration = arg;
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  frameRate(30);
+  frameRate(24);
   dist = 0;
+  tempml = new MachineLearning(5, 2, [8, 8, 8]);
   rows = floor(windowHeight / gridSize);
   cols = floor(windowWidth / gridSize);
   grid = new Grid(rows, cols);
@@ -39,12 +42,16 @@ function draw() {
   //if (solved) noLoop();
   //console.log("running");
   stroke(0);
-  grid.draw();
+  //if (carsInitialised == false)
+  if (!showTrails) grid.draw();
   if (aliveCars == 0) {
+    ("all cars inactive");
     nextGenerationCars();
+    frameCounter = 0;
   }
   if (carsInitialised) {
-    for (let i = 0; i < 2; i++) showCars();
+    //for (let i = 0; i < 2; i++)
+    showCars();
     //showVector();
     //showSensors();
   }

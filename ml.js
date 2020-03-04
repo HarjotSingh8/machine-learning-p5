@@ -5,23 +5,28 @@ let outputNodes;
 let intermediateLayers;
 let variation = 0.001;
 let generation = 1;
-let factor = 10;
+let factor = 0.01;
+let tempml;
 let percentToKeep = 1 / 10; //percent of best children to keep as it is for next generation
 /*
   order for sensors and forces (for code in cars or players, irrelevant for ML algorithm)
   Up, Down, Left, Right
 */
+function incRunDuration() {
+  runDuration += 30;
+}
 
 function nextGeneration() {
   /*
    * This function creates a new generation by taking best candidates from previous generations
    */
   generation++;
-  runDuration += 10 * generation;
-  factor += generation;
+  if (!reachedEnd) runDuration += 10 * generation;
+  //factor += generation;
   percentToKeep += 1 / 100;
   sortByFitness();
-  for (let i = parseInt(cars.length * percentToKeep); i < cars.length; i++) {
+  let i;
+  for (i = parseInt(cars.length * percentToKeep); i < cars.length * 0.9; i++) {
     //console.log(
     //  "destination = " + i + ",source = " + (i % (cars.length * percentToKeep))
     //);
@@ -29,6 +34,9 @@ function nextGeneration() {
     cars[i].ml.copyAndMutate(
       cars[parseInt(i % (cars.length * percentToKeep))].ml
     );
+  }
+  for (; i < cars.length; i++) {
+    cars[i].ml.generateRandomWeightsAndBiases();
   }
   /*for (let i = 1; i < cars.length; i++) {
     cars[i].ml.copyAndMutate(cars[0].ml);
@@ -42,17 +50,37 @@ function sortByFitness() {
    */
   for (let i = 0; i < cars.length; i++) {
     for (let j = i; j < cars.length; j++) {
-      if (cars[i].distance < cars[j].distance) {
-        let temp = cars[i];
-        cars[i] = cars[j];
-        cars[j] = temp;
-      }
-      if (cars[i].distance == cars[j].distance) {
+      /*if (cars[i].distance < cars[j].distance) {
+        tempml.copyAndMutate(cars[i].ml);
+        cars[i].ml.copyAndMutate(cars[j].ml);
+        cars[j].ml.copyAndMutate(tempml);
+
+        let temp = cars[i].distance;
+        cars[i].distance = cars[j].distance;
+        cars[j].distance = temp;
+      }*/
+      /*if (cars[i].distance == cars[j].distance) {
         if (cars[i].distance / cars[i].time < cars[j].distance / cars[i].time) {
           let temp = cars[i];
           cars[i] = cars[j];
           cars[j] = temp;
         }
+      }*/
+      if (
+        cars[i].distance +
+          10 * cars[i].fitnessvar1 +
+          cars[i].distance / cars[i].time <
+        cars[j].distance +
+          10 * cars[j].fitnessvar1 +
+          cars[j].distance / cars[j].time
+      ) {
+        tempml.mutateWeightsAndBiases(cars[i].ml, 0);
+        cars[i].ml.mutateWeightsAndBiases(cars[j].ml, 0);
+        cars[j].ml.mutateWeightsAndBiases(tempml, 0);
+
+        let temp = cars[i].distance;
+        cars[i].distance = cars[j].distance;
+        cars[j].distance = temp;
       }
     }
     //console.log(cars[i].distance);
@@ -156,20 +184,20 @@ class MachineLearning {
           /*
            * Mutate here
            */
-          let ran = Math.random(1, 10) / factor;
+          let ran = Math.random(); // factor;
           let sign = 1;
-          if (Math.random(-1, 1) < 0) sign = -1;
+          if (Math.random() < 0.5) sign = -1;
           //this.weights[i][j][k] += random(-10, 10) / 500;
           //this.biases[i][j][k] += random(-10, 10) / 500;
           //if (Math.random(0, 100) < factor) {
-          this.weights[i][j][k] = source.weights[i][j][k] + ran * sign;
+          this.weights[i][j][k] = source.weights[i][j][k] + ran * sign * factor;
           //+ Math.random(-10, 10) / factor;
           //}
-          ran = Math.random(1, 10) / factor;
+          ran = Math.random(); // factor;
           sign = 1;
-          if (Math.random(-1, 1) < 0) sign = -1;
+          if (Math.random() < 0.5) sign = -1;
           //if (Math.random(0, 100) < factor) {
-          this.biases[i][j][k] = source.biases[i][j][k] + ran * sign;
+          this.biases[i][j][k] = source.biases[i][j][k] + ran * sign * factor;
           // + Math.random(-5, 5) / factor;
           //}
         }

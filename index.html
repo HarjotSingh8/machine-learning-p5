@@ -9,6 +9,18 @@
         padding: 0;
         margin: 0;
       }
+      button {
+        position: relative;
+        background-color: rgba(255, 255, 255, 0.5);
+        color: black;
+        padding: 3px;
+        border-width: 1px;
+        border-radius: 5px;
+      }
+      #menuDiv {
+        position: relative;
+        visibility: hidden;
+      }
     </style>
     <script src="p5/p5.min.js"></script>
     <script src="sketch.js"></script>
@@ -18,11 +30,13 @@
     <script src="grid.js"></script>
   </head>
   <body>
-    <div
-      onclick="menuClicked()"
-      style="position:fixed; left:10px; top:10px; background-color: rgba(0,0,0,0.5); color:white;padding:3px"
-    >
-      Menu
+    <div style="position: fixed; padding: 0.5rem;">
+      <button id="menuBtn" onclick="menuClicked()">
+        Menu
+      </button>
+      <div id="menuDiv">
+        <button onclick="startButtonClicked()">Start/Next Gen</button>
+      </div>
     </div>
   </body>
 </html>

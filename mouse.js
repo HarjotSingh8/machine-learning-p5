@@ -4,10 +4,8 @@ let mouseSetsWall = false; /*This decides if dragging set or removes the walls*/
 let prevDestination = false;
 let last = null;
 let menuIsClicked = false;
-function menuClicked() {
-  console.log("mousePressed on menu");
-  menuIsClicked = true;
-}
+let menuVisibility = false;
+
 function mousePressed() {
   setTimeout(mouseisPressed, 10);
 }
@@ -19,7 +17,7 @@ function mouseisPressed() {
   if (menuIsClicked) {
     //do not perform actions on grid if mouse is pressed on menu items
     menuIsClicked = false;
-    initCars();
+    //initCars();
     return;
   }
 
@@ -115,4 +113,27 @@ function toggleMenuVisible() {
   var x = document.getElementById("menu");
   if (x.style.display == "none") x.style.display = "block";
   else x.style.display = "none";
+}
+
+function menuClicked() {
+  disableClick();
+  console.log("mousePressed on menu");
+  if (menuVisibility) {
+    document.getElementById("menuDiv").style.visibility = "hidden";
+    menuVisibility = false;
+  } else {
+    document.getElementById("menuDiv").style.visibility = "visible";
+    menuVisibility = true;
+  }
+  //menuIsClicked = true;
+}
+
+function startButtonClicked() {
+  disableClick();
+  initCars();
+}
+
+function disableClick() {
+  //disable clicks on canvas to interact with menu
+  menuIsClicked = true;
 }
