@@ -130,7 +130,17 @@ function menuClicked() {
 
 function startButtonClicked() {
   disableClick();
-  initCars();
+  if (carsInitialised == false) initCars();
+  else nextGenerationCars();
+}
+
+function toggleTrails() {
+  disableClick();
+  if (showTrails) {
+    showTrails = false;
+  } else {
+    showTrails = true;
+  }
 }
 
 function disableClick() {

@@ -15,7 +15,7 @@ function setRunDuration(arg) {
 }
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  frameRate(24);
+  frameRate(30);
   dist = 0;
   tempml = new MachineLearning(5, 2, [8, 8, 8]);
   rows = floor(windowHeight / gridSize);
