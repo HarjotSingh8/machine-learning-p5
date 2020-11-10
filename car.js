@@ -145,7 +145,7 @@ class car {
           return;
         }
         this.distance = box.distance;
-        this.fitness = box.distance;
+        this.fitness = box.distance/this.time;
       } else {
         if (this.active) aliveCars--;
         this.active = false;
