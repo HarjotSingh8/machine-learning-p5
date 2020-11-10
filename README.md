@@ -4,7 +4,7 @@ This project is a demonstration of Evolutionary machine learning algorithm in ru
 
 ### [Live Link](https://harjotsingh8.github.io/machine-learning-p5/)
 
-## Usage
+## Instructions
 
 Open this [live link](https://harjotsingh8.github.io/machine-learning-p5/) in your browser to get to a sandbox and refer to these steps if required:
 
@@ -12,26 +12,42 @@ Open this [live link](https://harjotsingh8.github.io/machine-learning-p5/) in yo
 
 2. Once you have selected the starting point, you can click or drag from the area around it to create a path (made of square blocks) for the entities to follow.
 
+###### Setting a starting point and creating a path
+
+![Starting](/Media/Demo.gif)
+
 3. Once you have created a path, you can click on the start button on top left corner to spawn entities, these entities will learn from performing completely random moves to traversing the path improving slowly generation over generation.
 
-## Instructions, Examples and Findings
+###### Start Button
 
-### Instructions
+![Start Button](/Media/StartButton.png)
 
-![](/Media/Demo.gif)
+###### First Generation
 
-### Examples
+![First Generation](/Media/Demo1_FirstGen.gif)
 
-### Findings
+## Examples and Findings
+
+- ### Examples
+
+| Generation       | Progress                                        |
+| ---------------- | ----------------------------------------------- |
+| First Generation | ![First Gen](/Media/Demo1_FirstGen.gif)         |
+| Generation 2-5   | ![First Gen](/Media/Demo1_6thGen.gif)           |
+| Generation 6     | ![First Gen](/Media/Demo1_IntermediateGens.gif) |
+
+- ### Findings
 
 ## Installation
 
 No installation is required.
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
 ## License
+
 [MIT](https://choosealicense.com/licenses/mit/)
