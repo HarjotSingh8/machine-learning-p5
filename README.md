@@ -33,8 +33,8 @@ Open this [live link](https://harjotsingh8.github.io/machine-learning-p5/) in yo
 | Generation       | Progress                                        |
 | ---------------- | ----------------------------------------------- |
 | First Generation | ![First Gen](/Media/Demo1_FirstGen.gif)         |
-| Generation 2-5   | ![First Gen](/Media/Demo1_6thGen.gif)           |
-| Generation 6     | ![First Gen](/Media/Demo1_IntermediateGens.gif) |
+| Generation 2-5   | ![First Gen](/Media/Demo1_IntermediateGens.gif) |
+| Generation 6     | ![First Gen](/Media/Demo1_6thGen.gif)           |
 
 - ### Findings
 
