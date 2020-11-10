@@ -18,7 +18,7 @@ Open this [live link](https://harjotsingh8.github.io/machine-learning-p5/) in yo
 
 ### Instructions
 
-[](/Media/Demo.gif)
+![](/Media/Demo.gif)
 
 ### Examples
 
