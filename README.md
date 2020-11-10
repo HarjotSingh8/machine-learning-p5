@@ -38,6 +38,17 @@ Open this [live link](https://harjotsingh8.github.io/machine-learning-p5/) in yo
 
 - ### Findings
 
+#### Randomisation over Time
+
+###### As the model trains, a huge reduction in randomisation can be seen
+
+| Stage              | Randomisation                                    |
+| ------------------ | ------------------------------------------------ |
+| First Gen          | ![First Gen](/Media/Randomisation_Beginning.png) |
+| Early Generations  | ![First Gen](/Media/Randomisation_Early.png)     |
+| Moderately Trained | ![First Gen](/Media/Randomisation_Mid.png)       |
+| Well Trained       | ![First Gen](/Media/Randomisation_Final.png)     |
+
 ## Installation
 
 No installation is required.
