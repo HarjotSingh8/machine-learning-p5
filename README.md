@@ -1,6 +1,6 @@
 # Evolutionary Machine Learning Algorithm in p5.js
 
-This project is a demonstration of Evolutionary machine learning algorithm in running purely in javascript.
+This project is a demonstration of Evolutionary Machine Learning Algorithm running purely in JavaScript.
 
 ### [Live Link](https://harjotsingh8.github.io/machine-learning-p5/)
 
