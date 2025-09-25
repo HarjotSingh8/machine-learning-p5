@@ -46,6 +46,13 @@ function nextGenerationCars() {
   } else colr = 100;
   aliveCars = numChildren;
   console.log("new generation");
+  
+  // If we're in random path mode, generate a new random path for this generation
+  if (isRandomPathMode) {
+    console.log("Regenerating random path for new generation");
+    generateRandomPath();
+  }
+  
   nextGeneration();
 }
 
