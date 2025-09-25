@@ -124,17 +124,9 @@ class Node {
     console.log(this.walls);
   }
   showWalls() {
-    stroke(0);
-    /*for (let i = 0; i < this.walls.length; i++) {
-      line(
-        this.walls[i][0].x,
-        this.walls[i][0].y,
-        this.walls[i][1].x,
-        this.walls[i][1].y
-      );
-    }*/
+    // Use a more distinctive color and weight for path borders
     stroke(0, 0, 255);
-    strokeWeight(1);
+    strokeWeight(2);
     for (let i = 0; i < this.walls.length; i++) {
       line(
         this.walls[i][0].x,
