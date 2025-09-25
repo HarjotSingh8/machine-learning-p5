@@ -22,6 +22,14 @@
         visibility: visible;
         background-color: rgba(255, 255, 255, 0.2);
         padding:5px;
+        pointer-events: auto; /* Ensure menu captures clicks */
+      }
+      #menuDiv button {
+        margin: 2px;
+        cursor: pointer;
+      }
+      #menuDiv button:hover {
+        background-color: rgba(255, 255, 255, 0.8);
       }
     </style>
     <script src="p5/p5.min.js"></script>
@@ -43,9 +51,12 @@
         <div style="color: white;">
           Click anywhere on the screen to set a starting point, 
           <br>after that click or drag on adjacent boxes to create a route, 
-          <br>after creating a route, click on Start button</div>
+          <br>or use the Generate Random Path button below.
+          <br>After creating a route, click on Start button</div>
         <button onclick="startButtonClicked()">Start/Next Gen</button>
+        <button onclick="generateRandomPath()">Generate Random Path</button>
         <button onclick="toggleTrails()">Toggle Trails</button>
+        <button onclick="clearPath()">Clear Path</button>
       </div>
     </div>
   </body>
