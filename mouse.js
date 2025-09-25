@@ -147,3 +147,67 @@ function disableClick() {
   //disable clicks on canvas to interact with menu
   menuIsClicked = true;
 }
+
+function autoGenerateTrack() {
+  disableClick();
+  console.log("Auto generating track");
+  
+  // Clear existing track
+  clearTrack();
+  
+  // Generate a simple L-shaped track
+  let startX = Math.floor(cols * 0.2); // Start at 20% from left
+  let startY = Math.floor(rows * 0.5); // Start at middle vertically
+  let endX = Math.floor(cols * 0.8); // End at 80% from left
+  let endY = Math.floor(rows * 0.2); // End at 20% from top
+  
+  // Set the starting point
+  let startBox = grid.grid[startY][startX];
+  startBox.path = true;
+  startBox.source = true;
+  source = startBox;
+  previous = startBox;
+  carStart = createVector(
+    source.xpos + gridSize / 2,
+    source.ypos + gridSize / 2
+  );
+  dist = 0;
+  
+  // Create horizontal path first
+  for (let x = startX + 1; x <= endX; x++) {
+    let box = grid.grid[startY][x];
+    addBoxToPath(box, previous);
+  }
+  
+  // Create vertical path
+  for (let y = startY - 1; y >= endY; y--) {
+    let box = grid.grid[y][endX];
+    addBoxToPath(box, previous);
+  }
+  
+  console.log("Track auto-generated");
+}
+
+function clearTrack() {
+  // Reset all grid nodes
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      let node = grid.grid[i][j];
+      node.path = false;
+      node.source = false;
+      node.distance = 0;
+      node.prev = null;
+      node.NumberOfNeighbors = 0;
+      // Reset walls
+      node.initWalls();
+      node.createWalls();
+    }
+  }
+  
+  // Reset global variables
+  source = null;
+  destination = null;
+  previous = null;
+  dist = 0;
+  carStart = undefined;
+}
