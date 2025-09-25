@@ -5,6 +5,7 @@ let prevDestination = false;
 let last = null;
 let menuIsClicked = false;
 let menuVisibility = true;
+let isRandomPathMode = false; /*Track if we're using auto-generated random paths*/
 
 function mousePressed() {
   // Check if click is on menu area first
@@ -65,6 +66,10 @@ function mouseisPressed() {
         source.ypos + gridSize / 2
       );
       mouseSetsWall = true;
+      
+      // Reset random path mode when manually creating paths
+      isRandomPathMode = false;
+      
       //initCars();
       box.draw();
     } else if (
@@ -184,6 +189,9 @@ function generateRandomPath() {
   // Clear existing path
   clearPath();
   
+  // Set random path mode flag AFTER clearing (since clearPath resets it)
+  isRandomPathMode = true;
+  
   // Generate random starting position
   let startCol = Math.floor(Math.random() * (cols - 20)) + 10; // Keep some margin
   let startRow = Math.floor(Math.random() * (rows - 20)) + 10;
@@ -198,8 +206,8 @@ function generateRandomPath() {
     source.ypos + gridSize / 2
   );
   
-  // Generate random path length (20-50 segments)
-  let pathLength = Math.floor(Math.random() * 30) + 20;
+  // Generate random path length (40-80 segments for longer paths)
+  let pathLength = Math.floor(Math.random() * 40) + 40;
   let currentBox = startBox;
   let pathBoxes = [startBox];
   let attempts = 0;
@@ -351,4 +359,7 @@ function clearPath() {
   previous = null;
   carStart = undefined;
   dist = 0;
+  
+  // Reset random path mode when manually clearing
+  isRandomPathMode = false;
 }
