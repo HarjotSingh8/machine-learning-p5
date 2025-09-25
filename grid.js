@@ -49,6 +49,7 @@ class Node {
     this.source = false;
     this.path = false;
     this.distance = 0;
+    this.NumberOfNeighbors = 0;
     this.prevNode = null;
     this.neighbors = [];
     this.walls;
